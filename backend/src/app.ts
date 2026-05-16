@@ -5,6 +5,7 @@ import express from 'express';
 import cors from 'cors';
 import connectDB from './config/database';
 import authRoutes from './routes/authRoutes';
+import taskRoutes from './routes/taskRoutes';
 import { errorHandler } from './middleware/errorHandler';
 
 connectDB();
@@ -21,10 +22,9 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/tasks', taskRoutes);
 
-// Health check
 app.get('/health', (req, res) => {
   res.status(200).json({
     success: true,
@@ -33,7 +33,6 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Error handler (should be last)
 app.use(errorHandler);
 
 // Handle 404
