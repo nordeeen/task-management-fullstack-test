@@ -1,4 +1,5 @@
-import type { TaskFormData, ValidationErrors } from "../types";
+import { useEffect, useState } from 'react';
+import type { Task, TaskFormData, ValidationErrors } from "../types";
 
 export const validateForm = (data: TaskFormData): ValidationErrors => {
   const errors: ValidationErrors = {};
@@ -14,4 +15,34 @@ export const validateForm = (data: TaskFormData): ValidationErrors => {
     }
   }
   return errors;
+};
+
+export const formatDate = (dateStr: string): string | null => {
+  if (!dateStr) return null;
+  return new Date(dateStr).toLocaleDateString('id-ID', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+};
+
+export const isOverdue = (task: Task): boolean =>
+  task.status !== 'done' &&
+  !!task.deadline &&
+  new Date(task.deadline) < new Date();
+
+export const getGreeting = (): string => {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 17) return 'Good afternoon';
+  return 'Good evening';
+};
+
+export const useDebounce = <T>(value: T, delay: number = 400): T => {
+  const [debounced, setDebounced] = useState<T>(value);
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return debounced;
 };

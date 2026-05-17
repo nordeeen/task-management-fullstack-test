@@ -1,19 +1,8 @@
 import { axiosInstance } from '../lib/axios';
-
-export type LoginPayload = {
-  email: string;
-  password: string;
-};
-
-export type RegisterPayload = {
-  name: string;
-  email: string;
-  password: string;
-};
+import type { LoginPayload, RegisterPayload } from '../types';
 
 export const register = async (payload: RegisterPayload) => {
   const response = await axiosInstance.post('/auth/register', payload);
-  console.log('response register:', response.data);
   return response.data;
 };
 

@@ -1,4 +1,8 @@
+import { SquarePen, Trash2 } from 'lucide-react';
 import type { Task } from '../types';
+import { Button } from './BtnCustom';
+import { formatDate } from '../utils';
+import { statusCardConfig } from '../constants';
 
 interface Props {
   task: Task;
@@ -6,27 +10,12 @@ interface Props {
   onDelete: (id: string) => void;
 }
 
-const statusConfig = {
-  pending: { label: 'Pending', color: 'bg-yellow-100 text-yellow-800' },
-  'in-progress': { label: 'In Progress', color: 'bg-blue-100 text-blue-800' },
-  done: { label: 'Done', color: 'bg-green-100 text-green-800' },
-};
-
 export default function TaskCard({ task, onEdit, onDelete }: Props) {
-  const status = statusConfig[task.status];
+  const status = statusCardConfig[task.status];
   const isOverdue =
     task.status !== 'done' &&
     task.deadline &&
     new Date(task.deadline) < new Date();
-
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
-  };
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow">
@@ -52,22 +41,27 @@ export default function TaskCard({ task, onEdit, onDelete }: Props) {
               className={`font-medium ${
                 isOverdue ? 'text-red-500' : 'text-gray-600'
               }`}>
-              {task.deadline ? formatDate(task.deadline) : '-'}
-              {isOverdue && ' ⚠ Terlambat'}
+              {task.deadline ? formatDate(task?.deadline) : '-'}
             </span>
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <button
+          <Button
             onClick={() => onEdit(task)}
-            className="text-sm bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-lg font-medium transition">
-            Edit
-          </button>
-          <button
-            onClick={() => onDelete(task.id)}
-            className="text-sm bg-red-50 hover:bg-red-100 text-red-500 px-3 py-1.5 rounded-lg font-medium transition">
-            Hapus
-          </button>
+            variant="secondary"
+            size="icon"
+            className="rounded-full p-1.5 hover:bg-indigo-500/20 text-indigo-400 transition-all cursor-pointer"
+            title="Edit">
+            <SquarePen className="w-3.5 h-3.5" />
+          </Button>
+          <Button
+            onClick={() => onDelete(task?._id)}
+            variant="danger"
+            size="icon"
+            className="rounded-full p-1.5 hover:bg-red-500/20 text-red-400 transition-all cursor-pointer"
+            title="Hapus">
+            <Trash2 className="w-3.5 h-3.5" />
+          </Button>
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Trash2 } from 'lucide-react';
+import { Button } from './BtnCustom';
 
 type DeleteConfirmModalProps = {
   isOpen: boolean;
@@ -15,8 +16,8 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
   onClose,
   onConfirm,
   loading = false,
-  title = 'Hapus Tugas?',
-  description = 'Tindakan ini tidak bisa dibatalkan. Tugas akan dihapus secara permanen.',
+  title = 'Hapus Tugas',
+  description = 'Apakah anda yakin ingin menghapus tugas ini secara permanen?',
 }) => {
   if (!isOpen) return null;
 
@@ -29,28 +30,17 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           </div>
           <div>
             <h3 className="text-base font-bold text-white mb-1">{title}</h3>
-            <p className="text-sm text-gray-500">{description}</p>
+            <p className="text-sm text-gray-300">{description}</p>
           </div>
         </div>
 
         <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={loading}
-            className="flex-1 bg-white/5 hover:bg-white/10 border border-white/8 
-            text-gray-300 py-2.5 rounded-xl text-sm font-medium transition-all disabled:opacity-50 cursor-pointer">
+          <Button onClick={onClose} disabled={loading} variant="secondary" className="flex-1 cursor-pointer">
             Batal
-          </button>
-
-          <button
-            type="button"
-            onClick={onConfirm}
-            disabled={loading}
-            className="flex-1 bg-red-500/80 hover:bg-red-500 text-white py-2.5 
-            rounded-xl text-sm font-semibold transition-all disabled:opacity-50 cursor-pointer">
+          </Button>
+          <Button onClick={onConfirm} disabled={loading} variant="danger" className="flex-1 cursor-pointer">
             {loading ? 'Menghapus...' : 'Ya, Hapus'}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

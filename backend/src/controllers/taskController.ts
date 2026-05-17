@@ -12,7 +12,6 @@ export const getTasks = async (req: Request, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 5;
-
     const result = await getTasksService(
       req.user._id,
       req.query.status as string,
@@ -82,11 +81,35 @@ export const getTask = async (req: Request, res: Response) => {
 
 export const createTask = async (req: Request, res: Response) => {
   try {
+    const { title, description, status, deadline } = req.body;
+
+    if (!title || title.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: 'Task title is required',
+      });
+    }
+
+    const validStatus = ['pending', 'in-progress', 'done'];
+    if (status && !validStatus.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid status',
+      });
+    }
+
+    if (deadline && isNaN(new Date(deadline).getTime())) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid deadline format',
+      });
+    }
+  
     const task = await createTaskService({
-      title: req.body.title,
-      description: req.body.description,
-      status: req.body.status || 'pending',
-      deadline: req.body.deadline ? new Date(req.body.deadline) : undefined,
+      title: title.trim(),
+      description,
+      status: status || 'pending',
+      deadline: deadline ? new Date(deadline) : undefined,
       userId: req.user._id,
     });
 
@@ -118,10 +141,34 @@ export const updateTask = async (req: Request, res: Response) => {
       });
     }
 
-    const updatedTask = await updateTaskService(
-      req.params.id as string,
-      req.body,
-    );
+    const { title, description, status, deadline } = req.body;
+
+    if (title !== undefined && title.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: 'Title is required',
+      });
+    }
+
+    const validStatus = ['pending', 'in-progress', 'done'];
+    if (status && !validStatus.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Status invalid',
+      });
+    }
+
+    if (deadline && isNaN(new Date(deadline).getTime())) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid deadline format',
+      });
+    }
+
+  const updatedTask = await updateTaskService(req.params.id as string, {
+      ...req.body,
+      title: title ? title.trim() : undefined,
+    });
 
     res.status(200).json({
       success: true,

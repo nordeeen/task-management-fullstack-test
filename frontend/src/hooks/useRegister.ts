@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { register, type RegisterPayload } from '../services/auth';
+import { register } from '../services/auth';
+import type { RegisterPayload } from '../types';
 
 export const useRegister = () => {
   const queryClient = useQueryClient();

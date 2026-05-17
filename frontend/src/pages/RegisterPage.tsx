@@ -29,8 +29,7 @@ export default function RegisterPage() {
 
     mutate(
       { name: form.name, email: form.email, password: form.password },
-      {
-        onError: (err: any) => {
+      { onError: (err: any) => {
           setError(err?.response?.data?.message || 'Register failed. Try again.');
         },
       },
@@ -123,8 +122,7 @@ export default function RegisterPage() {
                   }}
                   className={`w-full bg-[#1a1a2e] text-white placeholder-gray-600 rounded-xl 
                     px-4 py-3.5 pr-12 text-sm border transition-all focus:outline-none focus:ring-1 
-                    ${
-                      passwordError
+                    ${ passwordError
                         ? 'border-red-500/70 focus:border-red-500 focus:ring-red-500/20'
                         : 'border-white/8 focus:border-indigo-500 focus:ring-indigo-500/40'
                     }`}
@@ -164,4 +162,4 @@ export default function RegisterPage() {
       </div>
     </section>
   );
-}
+};

@@ -7,10 +7,11 @@ import {
 } from 'lucide-react';
 import { STATUS_CONFIG } from '../constants';
 import type { Task } from '../types';
+import { Button } from './BtnCustom';
 
 interface TaskGridCardProps {
   task: Task;
-  isOverdue: boolean;
+  isOverdue?: boolean;
   formatDate: (d: string) => string | null;
   onEdit: (t: Task) => void;
   onDelete: (id: string) => void;
@@ -34,29 +35,32 @@ export default function TaskGridCard({
         </span>
 
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
-          <button
-            type="button"
+          <Button
             onClick={() => onEdit(task)}
-            className="p-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 transition-all"
+            variant="secondary"
+            size="icon"
+            className="rounded-full p-1.5 hover:bg-indigo-500/20 text-indigo-400 transition-all cursor-pointer"
             title="Edit">
             <SquarePen className="w-3.5 h-3.5" />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => onDelete(task._id)}
-            className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-all"
+            variant="danger"
+            size="icon"
+            className="rounded-full p-1.5 hover:bg-red-500/20 text-red-400 transition-all cursor-pointer"
             title="Hapus">
             <Trash2 className="w-3.5 h-3.5" />
-          </button>
+          </Button>
         </div>
       </div>
 
       <div className="flex-1">
         <h3 className="font-semibold text-gray-200 text-sm leading-snug mb-1.5">
-          {task.title || '-'}
+          {task?.title || '-'}
         </h3>
         {task.description && (
           <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
-            {task.description || '-'}
+            {task?.description || '-'}
           </p>
         )}
       </div>
@@ -83,4 +87,4 @@ export default function TaskGridCard({
       </div>
     </div>
   );
-}
+};

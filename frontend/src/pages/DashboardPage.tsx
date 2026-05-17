@@ -23,34 +23,27 @@ import { DeleteConfirmModal } from '../components/DeleteConfirmModal';
 import { ITEMS_PER_PAGE, STATUS_FILTERS } from '../constants';
 import { Button } from '../components/BtnCustom';
 import { useTasks, useCreateTask, useUpdateTask, useDeleteTask } from '../hooks/useTasks';
+import { formatDate, isOverdue, getGreeting, useDebounce } from '../utils';
 
 export default function DashboardPage() {
   const authUser = useAuthStore((state) => state.user);
   const taskListRef = useRef<HTMLDivElement>(null);
 
-  const { mutateAsync: createTask } = useCreateTask();
-  const { mutateAsync: updateTaskMutation } = useUpdateTask();
-  const { mutateAsync: deleteTaskMutation } = useDeleteTask();
+  const { mutateAsync: createTask, isPending: isCreatePending } = useCreateTask();
+  const { mutateAsync: updateTaskMutation, isPending: isUpdatePending } = useUpdateTask();
+  const { mutateAsync: deleteTaskMutation, isPending: isDeletePending } = useDeleteTask();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editTask, setEditTask] = useState<Task | null>(null);
   const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 400);
   const [statusFilter, setStatusFilter] = useState<'all' | TaskStatus>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  // Debounce search 400ms — hindari request setiap keystroke
-  useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(search), 400);
-    return () => clearTimeout(t);
-  }, [search]);
-
-  // Reset ke halaman 1 jika filter berubah
   useEffect(() => { setCurrentPage(1); }, [debouncedSearch, statusFilter]);
 
-  // Fetch dari API — status, search, & pagination ditangani server-side
   const { data: taskResponse, isLoading, error } = useTasks({
     status: statusFilter,
     q: debouncedSearch,
@@ -60,22 +53,13 @@ export default function DashboardPage() {
 
   const tasks = taskResponse?.data ?? [];
   const totalPages = taskResponse?.totalPages ?? 1;
-  // `paginated` = tasks sudah merupakan hasil halaman saat ini dari server
   const paginated = tasks;
 
-  const stats = useMemo(
-    () => ({
+  const stats = useMemo(() => ({
       total: tasks.length,
-      pending: tasks.filter((t: any) => t.status === 'pending').length,
-      inProgress: tasks.filter((t: any) => t.status === 'in-progress').length,
-      done: tasks.filter((t: any) => t.status === 'done').length,
-      donePercent: tasks.length
-        ? Math.round(
-            (tasks.filter((t: any) => t.status === 'done').length /
-              tasks.length) *
-              100,
-          )
-        : 0,
+      pending: tasks.filter((t) => t.status === 'pending').length,
+      inProgress: tasks.filter((t) => t.status === 'in-progress').length,
+      done: tasks.filter((t) => t.status === 'done').length,
     }),
     [tasks],
   );
@@ -107,26 +91,6 @@ export default function DashboardPage() {
     setConfirmDeleteId(null);
   };
 
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return null;
-    return new Date(dateStr).toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
-  };
-
-  const isOverdue = (task: Task) =>
-    task.status !== 'done' &&
-    task.deadline &&
-    new Date(task.deadline) < new Date();
-
-  const getGreeting = () => {
-    const h = new Date().getHours();
-    if (h < 12) return 'Good morning';
-    if (h < 17) return 'Good afternoon';
-    return 'Good evening';
-  };
 
   return (
     <section className="flex h-screen bg-[#0f0f1a] overflow-hidden font-sans">
@@ -156,7 +120,7 @@ export default function DashboardPage() {
                 <CircleUserRound />
               </div>
               <div className="hidden sm:block leading-tight">
-                <div className="text-sm font-semibold text-gray-200">
+                <div className="text-sm font-semibold text-gray-200 capitalize">
                   {authUser?.name ?? 'User'}
                 </div>
                 <div className="text-xs text-gray-600">Admin</div>
@@ -176,10 +140,9 @@ export default function DashboardPage() {
             <div>
               <h1 className="text-2xl font-bold text-white tracking-tight">
                 {getGreeting()},{' '}
-                <span className="text-indigo-400">
-                  {authUser?.name?.split(' ')[0] ?? 'there'}
+                <span className="text-indigo-400 capitalize">
+                  {authUser?.name?.split(' ')[0] ?? '-'}
                 </span>
-                .
               </h1>
               <p className="text-sm text-gray-500 mt-1">
                 Kamu punya{' '}
@@ -242,16 +205,17 @@ export default function DashboardPage() {
                 <Button
                   key={f.value}
                   size="sm"
+                  className="capitalize cursor-pointer"
                   variant={statusFilter === f.value ? 'primary' : 'secondary'}
                   onClick={() => setStatusFilter(f.value)}>
-                  {f.label}
+                  {f.label || '-'}
                 </Button>
               ))}
             </div>
 
             <div className="flex items-center gap-2">
               <span className="text-xs text-gray-600 mr-1">
-                {tasks.length} tugas
+                {tasks?.length || 0} tugas
               </span>
               <div className="flex gap-1 bg-[#1a1a2e] border border-white/[0.07] rounded-xl p-1">
                 <Button
@@ -342,14 +306,15 @@ export default function DashboardPage() {
         editTask={editTask}
         onClose={handleCloseModal}
         onSubmit={handleSubmit}
-        isLoading={isLoading}
+        isLoading={isCreatePending || isUpdatePending}
       />
 
       <DeleteConfirmModal
         isOpen={!!confirmDeleteId}
+        loading={isDeletePending}
         onClose={() => setConfirmDeleteId(null)}
         onConfirm={() => confirmDeleteId && handleDelete(confirmDeleteId)}
       />
     </section>
   );
-}
+};

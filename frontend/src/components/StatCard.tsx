@@ -13,11 +13,8 @@ interface StatCardProps {
 export default function StatCard({
   label,
   value,
-  trend,
-  trendUp,
   badge,
   badgeCls,
-  progress,
   icon,
   iconBg,
 }: StatCardProps) {
@@ -34,25 +31,11 @@ export default function StatCard({
             {badge}
           </span>
         )}
-        {trend && (
-          <span
-            className={`text-[10px] font-semibold px-2 py-0.5 rounded-lg ${trendUp ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'}`}>
-            {trendUp ? '↑' : '↓'} {trend}
-          </span>
-        )}
       </div>
       <div className="text-3xl font-bold text-white mb-0.5">{value}</div>
       <div className="text-xs text-gray-600 uppercase tracking-wide">
         {label}
       </div>
-      {progress !== undefined && (
-        <div className="mt-3 h-1 bg-white/5 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-emerald-500 rounded-full transition-all"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      )}
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import type { Task, TaskFormData, ValidationErrors } from '../types';
 import { validateForm } from '../utils';
+import { Button } from './BtnCustom';
+import { LucideX } from 'lucide-react';
 
 interface Props {
   isOpen: boolean;
@@ -97,11 +99,11 @@ export default function TaskModal({
           <h2 className="text-lg font-bold text-gray-800">
             {editTask ? 'Edit Tugas' : 'Tambah Tugas Baru'}
           </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-xl leading-none">
-            ✕
-          </button>
+          <Button type="button" onClick={onClose} 
+            className="text-gray-400 hover:text-gray-600 text-xl leading-none cursor-pointer" 
+            variant='ghost' size='icon'>
+            <LucideX/>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
@@ -187,27 +189,26 @@ export default function TaskModal({
           </div>
 
           <div className="flex gap-3 pt-2">
-            <button
-              type="button"
+            <Button
               onClick={onClose}
+              variant="ghost"
+              size="lg"
               className="flex-1 border border-gray-300 text-gray-700 py-2 
-              rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+              rounded-lg text-sm font-medium hover:text-red-500 hover:border-red-500 transition cursor-pointer">
               Batal
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
+              variant="primary"
+              size="lg"
               disabled={!isFormValid || isLoading}
-              className={`flex-1 text-white py-2 rounded-lg text-sm font-medium transition
-                ${!isFormValid || isLoading
-                  ? 'bg-indigo-300 opacity-30 cursor-not-allowed'
-                  : 'bg-indigo-600 hover:bg-indigo-700 cursor-pointer'
-                }`}>
+              className="flex-1 py-2 rounded-lg text-sm font-medium cursor-pointer">
               {isLoading
                 ? 'Menyimpan...'
                 : editTask
                   ? 'Simpan Perubahan'
                   : 'Tambah Tugas'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

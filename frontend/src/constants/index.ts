@@ -26,3 +26,9 @@ export const STATUS_CONFIG = {
     dot: 'bg-emerald-400',
   },
 };
+
+export const statusCardConfig = {
+  pending: { label: 'Pending', color: 'bg-yellow-100 text-yellow-800' },
+  'in-progress': { label: 'In Progress', color: 'bg-blue-100 text-blue-800' },
+  done: { label: 'Done', color: 'bg-green-100 text-green-800' },
+};

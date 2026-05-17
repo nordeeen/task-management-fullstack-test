@@ -23,8 +23,7 @@ export default function LoginPage() {
 
     mutate(
       { email: form.email, password: form.password },
-      {
-        onError: (err: any) => {
+      { onError: (err: any) => {
           setError(err?.response?.data?.message || 'Login failed. Try again.');
         },
       },
@@ -96,11 +95,6 @@ export default function LoginPage() {
                 <label className="text-gray-300 text-sm font-medium">
                   Password
                 </label>
-                <a
-                  href="#"
-                  className="text-indigo-400 text-xs hover:text-indigo-300 transition-colors font-medium">
-                  Forgot password?
-                </a>
               </div>
               <div className="relative">
                 <input
