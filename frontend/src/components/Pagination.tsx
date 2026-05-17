@@ -18,8 +18,9 @@ export default function Pagination({
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg disabled:opacity-40 hover:bg-gray-50 transition">
-        ← Prev
+        className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg 
+        disabled:opacity-40 hover:bg-gray-50 transition bg-white cursor-pointer">
+        Prev
       </button>
 
       {pages.map((page) => (
@@ -29,7 +30,7 @@ export default function Pagination({
           className={`w-9 h-9 text-sm rounded-lg font-medium transition ${
             page === currentPage
               ? 'bg-indigo-600 text-white border border-indigo-600'
-              : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+              : 'border border-gray-300 text-white hover:bg-gray-50'
           }`}>
           {page}
         </button>
@@ -38,8 +39,9 @@ export default function Pagination({
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg disabled:opacity-40 hover:bg-gray-50 transition">
-        Next →
+        className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg 
+        disabled:opacity-40 hover:bg-gray-50 transition bg-white cursor-pointer">
+        Next
       </button>
     </div>
   );

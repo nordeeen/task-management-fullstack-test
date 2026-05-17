@@ -1,5 +1,5 @@
-import { useEffect, useState, useMemo } from 'react';
-import { useTaskStore } from '../stores/taskStore';
+import { useEffect, useState, useMemo, useRef } from 'react';
+import { useAuthStore } from '../stores/authStore';
 import Sidebar from '../components/Sidebar';
 import TaskModal from '../components/TaskModal';
 import Pagination from '../components/Pagination';
@@ -15,7 +15,6 @@ import {
   PackageSearch,
   Repeat2,
   SquareCheckBig,
-  StickyNote,
 } from 'lucide-react';
 import StatCard from '../components/StatCard';
 import TaskGridCard from '../components/TaskGridCard';
@@ -23,51 +22,46 @@ import TaskListRow from '../components/TaskListRow';
 import { DeleteConfirmModal } from '../components/DeleteConfirmModal';
 import { ITEMS_PER_PAGE, STATUS_FILTERS } from '../constants';
 import { Button } from '../components/BtnCustom';
+import { useTasks, useCreateTask, useUpdateTask, useDeleteTask } from '../hooks/useTasks';
 
 export default function DashboardPage() {
-  const {
-    tasks,
-    isLoading,
-    error,
-    fetchTasks,
-    addTask,
-    updateTask,
-    deleteTask,
-    clearError,
-  } = useTaskStore();
+  const authUser = useAuthStore((state) => state.user);
+  const taskListRef = useRef<HTMLDivElement>(null);
+
+  const { mutateAsync: createTask } = useCreateTask();
+  const { mutateAsync: updateTaskMutation } = useUpdateTask();
+  const { mutateAsync: deleteTaskMutation } = useDeleteTask();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editTask, setEditTask] = useState<Task | null>(null);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | TaskStatus>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
+  // Debounce search 400ms — hindari request setiap keystroke
   useEffect(() => {
-    fetchTasks();
-  }, []);
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [search, statusFilter]);
+    const t = setTimeout(() => setDebouncedSearch(search), 400);
+    return () => clearTimeout(t);
+  }, [search]);
 
-  const filtered = useMemo(
-    () =>
-      tasks.filter((t: any) => {
-        const matchSearch = t.title
-          .toLowerCase()
-          .includes(search.toLowerCase());
-        const matchStatus = statusFilter === 'all' || t.status === statusFilter;
-        return matchSearch && matchStatus;
-      }),
-    [tasks, search, statusFilter],
-  );
+  // Reset ke halaman 1 jika filter berubah
+  useEffect(() => { setCurrentPage(1); }, [debouncedSearch, statusFilter]);
 
-  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-  const paginated = filtered.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE,
-  );
+  // Fetch dari API — status, search, & pagination ditangani server-side
+  const { data: taskResponse, isLoading, error } = useTasks({
+    status: statusFilter,
+    q: debouncedSearch,
+    page: currentPage,
+    limit: ITEMS_PER_PAGE,
+  });
+
+  const tasks = taskResponse?.data ?? [];
+  const totalPages = taskResponse?.totalPages ?? 1;
+  // `paginated` = tasks sudah merupakan hasil halaman saat ini dari server
+  const paginated = tasks;
 
   const stats = useMemo(
     () => ({
@@ -100,9 +94,17 @@ export default function DashboardPage() {
   };
 
   const handleSubmit = async (data: TaskFormData) => {
-    if (editTask) await updateTask(editTask.id, data);
-    else await addTask(data);
+    if (editTask) {
+      await updateTaskMutation({ id: (editTask as any)._id, data });
+    } else {
+      await createTask(data);
+    }
     handleCloseModal();
+  };
+
+  const handleDelete = async (id: string) => {
+    await deleteTaskMutation(id);
+    setConfirmDeleteId(null);
   };
 
   const formatDate = (dateStr: string) => {
@@ -126,18 +128,14 @@ export default function DashboardPage() {
     return 'Good evening';
   };
 
-  const authUser = (() => {
-    try {
-      const raw = localStorage.getItem('task_auth');
-      return raw ? JSON.parse(raw)?.state?.user : null;
-    } catch {
-      return null;
-    }
-  })();
-
   return (
     <section className="flex h-screen bg-[#0f0f1a] overflow-hidden font-sans">
-      <Sidebar onAddTask={handleOpenAdd} />
+      <Sidebar
+        onAddTask={handleOpenAdd}
+        onScrollToTasks={() =>
+          taskListRef.current?.scrollIntoView({ behavior: 'smooth' })
+        }
+      />
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="bg-[#13131f] border-b border-white/6 px-6 py-3.5 flex items-center gap-4 shrink-0">
           <div className="flex-1 relative max-w-sm">
@@ -156,7 +154,6 @@ export default function DashboardPage() {
             <div className="flex items-center gap-2.5 pl-3 border-l border-white/6">
               <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
                 <CircleUserRound />
-                {/* {authUser?.name?.slice(0, 2).toUpperCase() ?? 'U'} */}
               </div>
               <div className="hidden sm:block leading-tight">
                 <div className="text-sm font-semibold text-gray-200">
@@ -170,11 +167,8 @@ export default function DashboardPage() {
 
         <main className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
           {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-xl px-4 py-3 flex justify-between items-center">
-              <span>{error}</span>
-              <button
-                onClick={clearError}
-                className="text-red-400 hover:text-red-300 transition-colors ml-4"></button>
+            <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-xl px-4 py-3">
+              {error.message || 'Gagal memuat tugas. Coba refresh halaman.'}
             </div>
           )}
 
@@ -242,7 +236,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Filter Status Task */}
-          <div className="flex items-center justify-between">
+          <div ref={taskListRef} className="flex items-center justify-between">
             <div className="flex gap-1.5">
               {STATUS_FILTERS.map((f) => (
                 <Button
@@ -257,7 +251,7 @@ export default function DashboardPage() {
 
             <div className="flex items-center gap-2">
               <span className="text-xs text-gray-600 mr-1">
-                {filtered.length} tugas
+                {tasks.length} tugas
               </span>
               <div className="flex gap-1 bg-[#1a1a2e] border border-white/[0.07] rounded-xl p-1">
                 <Button
@@ -278,7 +272,6 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Task content */}
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-24 gap-3">
               <div className="w-8 h-8 border-2 border-white/10 border-t-indigo-500 rounded-full animate-spin" />
@@ -320,18 +313,6 @@ export default function DashboardPage() {
                   onDelete={setConfirmDeleteId}
                 />
               ))}
-
-              <Button
-                variant="dashed"
-                onClick={handleOpenAdd}
-                className="flex-col py-10 min-h-40 w-full group"
-                icon={
-                  <div className="w-10 h-10 rounded-xl bg-white/4 group-hover:bg-indigo-500/15 flex items-center justify-center transition-all">
-                    <StickyNote className="w-5 h-5" />
-                  </div>
-                }>
-                Create New Task
-              </Button>
             </div>
           ) : (
             <div className="space-y-2">
@@ -367,11 +348,7 @@ export default function DashboardPage() {
       <DeleteConfirmModal
         isOpen={!!confirmDeleteId}
         onClose={() => setConfirmDeleteId(null)}
-        onConfirm={async () => {
-          if (!confirmDeleteId) return;
-          await deleteTask(confirmDeleteId);
-          setConfirmDeleteId(null);
-        }}
+        onConfirm={() => confirmDeleteId && handleDelete(confirmDeleteId)}
       />
     </section>
   );

@@ -3,12 +3,15 @@ import { PackageCheck } from 'lucide-react';
 import { PasswordToggleButton } from '../components/PasswordToggleBtn';
 import { PrimaryButton } from '../components/PrimaryBtn';
 import { useNavigate } from 'react-router-dom';
+import { useRegister } from '../hooks/useRegister';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const { mutate, isPending } = useRegister();
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [passwordError, setPasswordError] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,7 +20,16 @@ export default function RegisterPage() {
       return;
     }
     setPasswordError(false);
-    console.log('Register:', form);
+    setError('');
+
+    mutate(
+      { name: form.name, email: form.email, password: form.password },
+      {
+        onError: (err: any) => {
+          setError(err?.response?.data?.message || 'Register failed. Try again.');
+        },
+      },
+    );
   };
 
   return (
@@ -124,7 +136,14 @@ export default function RegisterPage() {
                 </p>
               )}
             </div>
-            <PrimaryButton type="submit">Sign up</PrimaryButton>
+            {error && (
+              <p className="text-red-400 text-xs flex items-center gap-1.5">
+                {error}
+              </p>
+            )}
+            <PrimaryButton type="submit">
+              {isPending ? 'Creating account...' : 'Sign up'}
+            </PrimaryButton>
           </form>
 
           <p className="text-center text-gray-500 text-sm mt-8 cursor-pointer">

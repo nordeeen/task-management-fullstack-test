@@ -45,11 +45,18 @@ export default function TaskModal({
 
   useEffect(() => {
     if (editTask) {
+      const toDateInput = (dateStr?: string) => {
+        if (!dateStr) return '';
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return '';
+        return d.toISOString().slice(0, 10);
+      };
+
       setForm({
         title: editTask.title,
         description: editTask.description,
         status: editTask.status,
-        deadline: editTask.deadline || '',
+        deadline: toDateInput(editTask.deadline),
       });
     } else {
       setForm(defaultForm);
@@ -108,10 +115,9 @@ export default function TaskModal({
         </div>
 
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
-          {/* Title */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Judul <span className="text-red-500">*</span>
+              Title <span className="text-red-500">*</span>
             </label>
             <input
               name="title"
@@ -120,8 +126,9 @@ export default function TaskModal({
               onChange={handleChange}
               onBlur={handleBlur}
               placeholder="Contoh: Buat laporan mingguan"
-              className={`w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-300 transition ${
-                errors.title
+              className={`w-full border rounded-lg px-3 py-2 text-sm outline-none 
+                focus:ring-2 focus:ring-indigo-300 transition 
+                ${errors.title
                   ? 'border-red-400 focus:ring-red-200'
                   : 'border-gray-300'
               }`}
@@ -131,10 +138,9 @@ export default function TaskModal({
             )}
           </div>
 
-          {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Deskripsi
+              Description
             </label>
             <textarea
               name="description"
@@ -142,11 +148,11 @@ export default function TaskModal({
               onChange={handleChange}
               rows={3}
               placeholder="Detail tugas (opsional)..."
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-300 transition resize-none"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm 
+              outline-none focus:ring-2 focus:ring-indigo-300 transition resize-none"
             />
           </div>
 
-          {/* Status */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Status
@@ -155,14 +161,14 @@ export default function TaskModal({
               name="status"
               value={form.status}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-300 transition bg-white">
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm 
+              outline-none focus:ring-2 focus:ring-indigo-300 transition bg-white">
               <option value="pending">Pending</option>
               <option value="in-progress">In Progress</option>
               <option value="done">Done</option>
             </select>
           </div>
 
-          {/* Deadline */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Deadline
@@ -188,13 +194,15 @@ export default function TaskModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+              className="flex-1 border border-gray-300 text-gray-700 py-2 
+              rounded-lg text-sm font-medium hover:bg-gray-50 transition">
               Batal
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white py-2 rounded-lg text-sm font-medium transition">
+              className="flex-1 bg-indigo-600 hover:bg-indigo-700 
+              disabled:bg-indigo-300 text-white py-2 rounded-lg text-sm font-medium transition">
               {isLoading
                 ? 'Menyimpan...'
                 : editTask

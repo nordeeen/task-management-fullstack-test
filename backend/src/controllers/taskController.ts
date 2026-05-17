@@ -8,18 +8,25 @@ import {
   deleteTaskService,
 } from '../services/taskService';
 
-// GET all tasks
 export const getTasks = async (req: Request, res: Response) => {
   try {
-    const tasks = await getTasksService(
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 5;
+
+    const result = await getTasksService(
       req.user._id,
       req.query.status as string,
+      page,
+      limit,
     );
 
     res.status(200).json({
       success: true,
-      count: tasks.length,
-      data: tasks,
+      count: result.data.length,
+      total: result.total,
+      page: result.page,
+      totalPages: result.totalPages,
+      data: result.data,
     });
   } catch (error) {
     console.error('Get tasks error:', error);
@@ -27,11 +34,9 @@ export const getTasks = async (req: Request, res: Response) => {
   }
 };
 
-// SEARCH tasks
 export const searchTasks = async (req: Request, res: Response) => {
   try {
     const { q } = req.query;
-
     if (!q) {
       return res.status(400).json({
         success: false,
@@ -40,7 +45,6 @@ export const searchTasks = async (req: Request, res: Response) => {
     }
 
     const tasks = await searchTasksService(req.user._id, q as string);
-
     res.status(200).json({
       success: true,
       count: tasks.length,
@@ -52,11 +56,9 @@ export const searchTasks = async (req: Request, res: Response) => {
   }
 };
 
-// GET single task
 export const getTask = async (req: Request, res: Response) => {
   try {
     const task = await getTaskByIdService(req.params.id as string);
-
     if (!task) {
       return res.status(404).json({
         success: false,
@@ -78,7 +80,6 @@ export const getTask = async (req: Request, res: Response) => {
   }
 };
 
-// CREATE task
 export const createTask = async (req: Request, res: Response) => {
   try {
     const task = await createTaskService({
@@ -100,11 +101,9 @@ export const createTask = async (req: Request, res: Response) => {
   }
 };
 
-// UPDATE task
 export const updateTask = async (req: Request, res: Response) => {
   try {
     const task = await getTaskByIdService(req.params.id as string);
-
     if (!task) {
       return res.status(404).json({
         success: false,
@@ -135,11 +134,9 @@ export const updateTask = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE task
 export const deleteTask = async (req: Request, res: Response) => {
   try {
     const task = await getTaskByIdService(req.params.id as string);
-
     if (!task) {
       return res.status(404).json({
         success: false,
@@ -155,7 +152,6 @@ export const deleteTask = async (req: Request, res: Response) => {
     }
 
     await deleteTaskService(task);
-
     res.status(200).json({
       success: true,
       message: 'Task deleted successfully',

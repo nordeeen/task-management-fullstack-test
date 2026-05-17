@@ -42,7 +42,7 @@ export default function TaskGridCard({
             <SquarePen className="w-3.5 h-3.5" />
           </button>
           <button
-            onClick={() => onDelete(task.id)}
+            onClick={() => onDelete(task._id)}
             className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-all"
             title="Hapus">
             <Trash2 className="w-3.5 h-3.5" />
@@ -50,14 +50,13 @@ export default function TaskGridCard({
         </div>
       </div>
 
-      {/* Content */}
       <div className="flex-1">
         <h3 className="font-semibold text-gray-200 text-sm leading-snug mb-1.5">
-          {task.title}
+          {task.title || '-'}
         </h3>
         {task.description && (
           <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
-            {task.description}
+            {task.description || '-'}
           </p>
         )}
       </div>

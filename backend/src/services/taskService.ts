@@ -1,14 +1,25 @@
 import Task from '../models/Task';
 
-// Get all tasks
-export const getTasksService = async (userId: string, status?: string) => {
+// Get all tasks (with pagination)
+export const getTasksService = async (
+  userId: string,
+  status?: string,
+  page: number = 1,
+  limit: number = 5,
+) => {
   const filter: any = { userId };
 
   if (status && status !== 'all') {
     filter.status = status;
   }
 
-  return await Task.find(filter).sort({ createdAt: -1 });
+  const skip = (page - 1) * limit;
+  const [data, total] = await Promise.all([
+    Task.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+    Task.countDocuments(filter),
+  ]);
+
+  return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
 };
 
 // Search tasks

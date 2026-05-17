@@ -44,8 +44,6 @@ export default function TaskListRow({
             <SquareCheckBig className="w-3.5 h-3.5" />
             Done
           </span>
-        ) : isOverdue ? (
-          <span className="text-red-400 font-medium">⚠ Terlambat</span>
         ) : task.deadline ? (
           <span className="text-gray-600">{formatDate(task.deadline)}</span>
         ) : (
@@ -62,7 +60,7 @@ export default function TaskListRow({
           <SquarePen className="w-3.5 h-3.5" />
         </button>
         <button
-          onClick={() => onDelete(task.id)}
+          onClick={() => onDelete(task._id)}
           className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-all"
           title="Hapus">
           <Trash2 className="w-3.5 h-3.5" />

@@ -1,15 +1,5 @@
 export type TaskStatus = 'pending' | 'in-progress' | 'done';
 
-export interface Task {
-  id: string;
-  title: string;
-  description: string;
-  status: TaskStatus;
-  deadline: string;
-  createdAt: string;
-  userId: string;
-}
-
 export interface User {
   id: string;
   name: string;
@@ -49,3 +39,29 @@ export interface ValidationErrors {
   deadline?: string;
   status?: string;
 }
+
+export type Task = {
+  _id: string;
+  title: string;
+  description: string;
+  status: 'pending' | 'in-progress' | 'done';
+  deadline: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+
+export type GetTasksParams = {
+  status?: string;
+  q?: string;
+  page?: number;
+  limit?: number;
+};
+
+export type PaginatedTasksResponse = {
+  data: Task[];
+  total: number;
+  page: number;
+  totalPages: number;
+};

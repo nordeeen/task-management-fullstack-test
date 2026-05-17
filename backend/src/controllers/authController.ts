@@ -7,7 +7,6 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
     const result = await loginUser(email, password);
-
     const { user, token } = result;
 
     res.cookie('token', token, {
@@ -38,17 +37,12 @@ export const register = async (req: Request, res: Response) => {
     const { name, email, password } = req.body;
     const result = await registerUser(name, email, password);
 
-    res.cookie('token', result.token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
     res.status(201).json({
       success: true,
       message: 'User berhasil terdaftar',
-      data: result,
+      data: {
+        user: result.user,
+      },
     });
   } catch (err: any) {
     res.status(400).json({
@@ -62,7 +56,6 @@ export const register = async (req: Request, res: Response) => {
 
 export const getMe = async (req: Request, res: Response) => {
   try {
-    // get token from header or cookie
     let token: string | undefined;
 
     if (
@@ -119,7 +112,7 @@ export const logoutUser = async (_req: Request, res: Response) => {
 
     res.status(200).json({
       success: true,
-      message: 'Logged out successfully',
+      message: 'Logout Berhasil',
     });
   } catch (err: any) {
     res.status(500).json({
