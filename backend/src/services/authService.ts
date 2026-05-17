@@ -7,7 +7,7 @@ export const registerUser = async (
   password: string,
 ) => {
   const existing = await User.findOne({ email });
-  if (existing) throw new Error('User already exists');
+  if (existing) throw new Error('Email sudah terdaftar');
 
   const user = await User.create({
     name,

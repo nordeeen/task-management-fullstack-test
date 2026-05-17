@@ -13,6 +13,11 @@ export default function RegisterPage() {
   const [passwordError, setPasswordError] = useState(false);
   const [error, setError] = useState('');
 
+  const isFormValid =
+    form.name.trim() !== '' &&
+    form.email.trim() !== '' &&
+    form.password.length >= 8;
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (form.password.length < 8) {
@@ -141,7 +146,7 @@ export default function RegisterPage() {
                 {error}
               </p>
             )}
-            <PrimaryButton type="submit">
+            <PrimaryButton type="submit" disabled={!isFormValid || isPending}>
               {isPending ? 'Creating account...' : 'Sign up'}
             </PrimaryButton>
           </form>

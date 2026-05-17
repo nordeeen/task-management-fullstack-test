@@ -12,6 +12,8 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const { mutate, isPending } = useLogin();
 
+  const isFormValid = form.email.trim() !== '' && form.password.trim() !== '';
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.email || !form.password) {
@@ -128,7 +130,7 @@ export default function LoginPage() {
                 </p>
               )}
             </div>
-            <PrimaryButton type="submit">
+            <PrimaryButton type="submit" disabled={!isFormValid || isPending}>
               {isPending ? 'Loading...' : 'Sign in'}
             </PrimaryButton>
           </form>

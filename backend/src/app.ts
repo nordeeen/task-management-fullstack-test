@@ -4,19 +4,15 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import connectDB from './config/database';
 import authRoutes from './routes/authRoutes';
 import taskRoutes from './routes/taskRoutes';
 import { errorHandler } from './middleware/errorHandler';
-
-connectDB();
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Middleware
 app.use(
   cors({
     origin: 'http://localhost:5173',
@@ -43,14 +39,6 @@ app.use((req, res) => {
     success: false,
     message: `Cannot find ${req.method} ${req.url}`,
   });
-});
-
-const PORT = process.env.PORT || 5000;
-console.log('APP INSTANCE ID:', Date.now());
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV}`);
 });
 
 export default app;

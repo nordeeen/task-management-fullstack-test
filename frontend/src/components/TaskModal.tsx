@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Task, TaskFormData, ValidationErrors } from '../types';
+import { validateForm } from '../utils';
 
 interface Props {
   isOpen: boolean;
@@ -14,22 +15,6 @@ const defaultForm: TaskFormData = {
   description: '',
   status: 'pending',
   deadline: '',
-};
-
-const validateForm = (data: TaskFormData): ValidationErrors => {
-  const errors: ValidationErrors = {};
-  if (!data.title.trim()) {
-    errors.title = 'Judul tidak boleh kosong';
-  } else if (data.title.trim().length < 3) {
-    errors.title = 'Judul minimal 3 karakter';
-  }
-  if (data.deadline) {
-    const date = new Date(data.deadline);
-    if (isNaN(date.getTime())) {
-      errors.deadline = 'Format tanggal tidak valid';
-    }
-  }
-  return errors;
 };
 
 export default function TaskModal({
@@ -88,6 +73,11 @@ export default function TaskModal({
     setErrors(validateForm(form));
   };
 
+  const isFormValid =
+    form.title.trim().length >= 3 &&
+    form.deadline.trim() !== '' &&
+    Object.keys(validateForm(form)).length === 0;
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const allTouched = { title: true, description: true, deadline: true };
@@ -99,7 +89,7 @@ export default function TaskModal({
   };
 
   return (
-    <div
+    <section
       className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
       onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
@@ -177,6 +167,12 @@ export default function TaskModal({
               name="deadline"
               type="date"
               value={form.deadline}
+              min={(() => {
+                // untuk mencegah user memilih tanggal hari ini atau sebelumnya
+                const d = new Date();
+                d.setDate(d.getDate() + 1);
+                return d.toISOString().slice(0, 10);
+              })()} 
               onChange={handleChange}
               onBlur={handleBlur}
               className={`w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-300 transition ${
@@ -200,9 +196,12 @@ export default function TaskModal({
             </button>
             <button
               type="submit"
-              disabled={isLoading}
-              className="flex-1 bg-indigo-600 hover:bg-indigo-700 
-              disabled:bg-indigo-300 text-white py-2 rounded-lg text-sm font-medium transition">
+              disabled={!isFormValid || isLoading}
+              className={`flex-1 text-white py-2 rounded-lg text-sm font-medium transition
+                ${!isFormValid || isLoading
+                  ? 'bg-indigo-300 opacity-30 cursor-not-allowed'
+                  : 'bg-indigo-600 hover:bg-indigo-700 cursor-pointer'
+                }`}>
               {isLoading
                 ? 'Menyimpan...'
                 : editTask
@@ -212,6 +211,6 @@ export default function TaskModal({
           </div>
         </form>
       </div>
-    </div>
+    </section>
   );
 }
