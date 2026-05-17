@@ -7,18 +7,19 @@ Aplikasi manajemen tugas pribadi berbasis fullstack yang dibangun dengan **Expre
 ## Screenshots
 
 ### Halaman Login
+
 ![Halaman Login](screenshot/login-page-task-manager.png)
 
 ## Tech Stack
 
-| Layer | Teknologi |
-|-------|-----------|
-| Frontend | React 18, TypeScript, Vite, Tailwind CSS v4 |
+| Layer            | Teknologi                                           |
+| ---------------- | --------------------------------------------------- |
+| Frontend         | React 18, TypeScript, Vite, Tailwind CSS v4         |
 | State Management | Zustand (auth), TanStack React Query (server state) |
-| Backend | Express.js, TypeScript, Node.js |
-| Database | MongoDB dengan Mongoose |
-| Autentikasi | JWT via HTTP-only cookies |
-| Testing | Jest + Supertest (backend) |
+| Backend          | Express.js, TypeScript, Node.js                     |
+| Database         | MongoDB dengan Mongoose                             |
+| Autentikasi      | JWT via HTTP-only cookies                           |
+| Testing          | Jest + Supertest (backend)                          |
 
 ---
 
@@ -91,24 +92,29 @@ JWT_SECRET=isi_dengan_string_random_yang_panjang
 JWT_EXPIRE=7d
 PORT=5000
 CORS_ORIGIN=http://localhost:5173
+NODE_ENV=development
 ```
 
-| Variable | Keterangan |
-|----------|------------|
-| `MONGODB_URI` | String koneksi MongoDB |
-| `JWT_SECRET` | Kunci rahasia untuk menandatangani JWT (gunakan string random yang panjang) |
-| `JWT_EXPIRE` | Durasi kedaluwarsa token (contoh: `7d`, `24h`) |
-| `PORT` | Port server API berjalan |
-| `CORS_ORIGIN` | Origin frontend yang diizinkan |
+| Variable      | Keterangan                                                                  |
+| ------------- | --------------------------------------------------------------------------- |
+| `MONGODB_URI` | String koneksi MongoDB                                                      |
+| `JWT_SECRET`  | Kunci rahasia untuk menandatangani JWT (gunakan string random yang panjang) |
+| `JWT_EXPIRE`  | Durasi kedaluwarsa token (contoh: `7d`, `24h`)                              |
+| `PORT`        | Port server API berjalan                                                    |
+| `CORS_ORIGIN` | Origin frontend yang diizinkan                                              |
+| `NODE_ENV`    | Environment aplikasi (contoh: `development`, `production`)                  |
 
 **3. Pastikan MongoDB sudah berjalan**
 
 - Windows: buka MongoDB Compass atau jalankan `mongod` di terminal
 - Mac:
+
 ```bash
 brew services start mongodb-community
 ```
+
 - Linux:
+
 ```bash
 sudo systemctl start mongod
 ```
@@ -164,12 +170,12 @@ Semua endpoint tugas memerlukan autentikasi (JWT cookie yang di-set setelah logi
 
 ### Autentikasi
 
-| Method | Endpoint | Keterangan | Perlu Auth |
-|--------|----------|------------|:----------:|
-| `POST` | `/auth/register` | Daftarkan user baru | ❌ |
-| `POST` | `/auth/login` | Login & set cookie | ❌ |
-| `POST` | `/auth/logout` | Hapus cookie autentikasi | ❌ |
-| `GET` | `/auth/me` | Ambil data user yang sedang login | ✅ |
+| Method | Endpoint         | Keterangan                        | Perlu Auth |
+| ------ | ---------------- | --------------------------------- | :--------: |
+| `POST` | `/auth/register` | Daftarkan user baru               |     ❌     |
+| `POST` | `/auth/login`    | Login & set cookie                |     ❌     |
+| `POST` | `/auth/logout`   | Hapus cookie autentikasi          |     ❌     |
+| `GET`  | `/auth/me`       | Ambil data user yang sedang login |     ✅     |
 
 **Contoh Request Body:**
 
@@ -190,14 +196,14 @@ Semua endpoint tugas memerlukan autentikasi (JWT cookie yang di-set setelah logi
 
 ### Tugas
 
-| Method | Endpoint | Keterangan | Query Params |
-|--------|----------|------------|-------------|
-| `GET` | `/tasks` | Ambil daftar tugas (dengan pagination) | `page`, `limit`, `status`, `q` |
-| `POST` | `/tasks` | Buat tugas baru | — |
-| `GET` | `/tasks/:id` | Ambil detail satu tugas | — |
-| `PUT` | `/tasks/:id` | Update tugas | — |
-| `DELETE` | `/tasks/:id` | Hapus tugas | — |
-| `GET` | `/tasks/search` | Cari tugas berdasarkan judul | `q` |
+| Method   | Endpoint        | Keterangan                             | Query Params                   |
+| -------- | --------------- | -------------------------------------- | ------------------------------ |
+| `GET`    | `/tasks`        | Ambil daftar tugas (dengan pagination) | `page`, `limit`, `status`, `q` |
+| `POST`   | `/tasks`        | Buat tugas baru                        | —                              |
+| `GET`    | `/tasks/:id`    | Ambil detail satu tugas                | —                              |
+| `PUT`    | `/tasks/:id`    | Update tugas                           | —                              |
+| `DELETE` | `/tasks/:id`    | Hapus tugas                            | —                              |
+| `GET`    | `/tasks/search` | Cari tugas berdasarkan judul           | `q`                            |
 
 **Contoh Objek Tugas:**
 
@@ -249,16 +255,17 @@ cd frontend && npm run dev
 
 ### Backend (`backend/.env`)
 
-| Variable | Wajib | Contoh |
-|----------|:-----:|--------|
-| `MONGODB_URI` | ✅ | `mongodb://localhost:27017/task_management` |
-| `JWT_SECRET` | ✅ | `string_random_yang_sangat_panjang` |
-| `JWT_EXPIRE` | ✅ | `7d` |
-| `PORT` | ✅ | `5000` |
-| `CORS_ORIGIN` | ✅ | `http://localhost:5173` |
+| Variable      | Wajib | Contoh                                      |
+| ------------- | :---: | ------------------------------------------- |
+| `MONGODB_URI` |  ✅   | `mongodb://localhost:27017/task_management` |
+| `JWT_SECRET`  |  ✅   | `string_random_yang_sangat_panjang`         |
+| `JWT_EXPIRE`  |  ✅   | `7d`                                        |
+| `PORT`        |  ✅   | `5000`                                      |
+| `CORS_ORIGIN` |  ✅   | `http://localhost:5173`                     |
+| `NODE_ENV`    |  ✅   | `development`                               |
 
 ### Frontend (`frontend/.env`)
 
-| Variable | Wajib | Contoh |
-|----------|:-----:|--------|
-| `VITE_API_URL` | ✅ | `http://localhost:5000/api` |
+| Variable       | Wajib | Contoh                      |
+| -------------- | :---: | --------------------------- |
+| `VITE_API_URL` |  ✅   | `http://localhost:5000/api` |
