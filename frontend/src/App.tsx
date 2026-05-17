@@ -4,6 +4,7 @@ import { ProtectedRoute, GuestRoute } from './components/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
+import { Toaster } from 'react-hot-toast';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,6 +21,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <Toaster position="top-center" reverseOrder={true} />
         <Routes>
           <Route
             path="/login"
@@ -50,4 +52,4 @@ export default function App() {
       </BrowserRouter>
     </QueryClientProvider>
   );
-};
+}

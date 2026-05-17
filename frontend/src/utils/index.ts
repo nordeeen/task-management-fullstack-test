@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { Task, TaskFormData, ValidationErrors } from "../types";
+import type { Task, TaskFormData, ValidationErrors } from '../types';
 
 export const validateForm = (data: TaskFormData): ValidationErrors => {
   const errors: ValidationErrors = {};
@@ -32,10 +32,13 @@ export const isOverdue = (task: Task): boolean =>
   new Date(task.deadline) < new Date();
 
 export const getGreeting = (): string => {
-  const h = new Date().getHours();
-  if (h < 12) return 'Good morning';
-  if (h < 17) return 'Good afternoon';
-  return 'Good evening';
+  const h = new Date(
+    new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }),
+  ).getHours();
+
+  if (h < 12) return 'Selamat Pagi';
+  if (h < 17) return 'Selamat Siang';
+  return 'Selamat Malam';
 };
 
 export const useDebounce = <T>(value: T, delay: number = 400): T => {

@@ -21,7 +21,12 @@ import TaskListRow from '../components/TaskListRow';
 import { DeleteConfirmModal } from '../components/DeleteConfirmModal';
 import { ITEMS_PER_PAGE, STATUS_FILTERS } from '../constants';
 import { Button } from '../components/BtnCustom';
-import { useTasks, useCreateTask, useUpdateTask, useDeleteTask } from '../hooks/useTasks';
+import {
+  useTasks,
+  useCreateTask,
+  useUpdateTask,
+  useDeleteTask,
+} from '../hooks/useTasks';
 import { formatDate, isOverdue, getGreeting, useDebounce } from '../utils';
 
 export default function DashboardPage() {
@@ -29,9 +34,12 @@ export default function DashboardPage() {
   const taskListRef = useRef<HTMLDivElement>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const { mutateAsync: createTask, isPending: isCreatePending } = useCreateTask();
-  const { mutateAsync: updateTaskMutation, isPending: isUpdatePending } = useUpdateTask();
-  const { mutateAsync: deleteTaskMutation, isPending: isDeletePending } = useDeleteTask();
+  const { mutateAsync: createTask, isPending: isCreatePending } =
+    useCreateTask();
+  const { mutateAsync: updateTaskMutation, isPending: isUpdatePending } =
+    useUpdateTask();
+  const { mutateAsync: deleteTaskMutation, isPending: isDeletePending } =
+    useDeleteTask();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editTask, setEditTask] = useState<Task | null>(null);
@@ -42,9 +50,15 @@ export default function DashboardPage() {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  useEffect(() => { setCurrentPage(1); }, [debouncedSearch, statusFilter]);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch, statusFilter]);
 
-  const { data: taskResponse, isLoading, error } = useTasks({
+  const {
+    data: taskResponse,
+    isLoading,
+    error,
+  } = useTasks({
     status: statusFilter,
     q: debouncedSearch,
     page: currentPage,
@@ -55,7 +69,8 @@ export default function DashboardPage() {
   const totalPages = taskResponse?.totalPages ?? 1;
   const paginated = tasks;
 
-  const stats = useMemo(() => ({
+  const stats = useMemo(
+    () => ({
       total: tasks.length,
       pending: tasks.filter((t) => t.status === 'pending').length,
       inProgress: tasks.filter((t) => t.status === 'in-progress').length,
@@ -91,14 +106,10 @@ export default function DashboardPage() {
     setConfirmDeleteId(null);
   };
 
-
   return (
     <section className="flex h-screen bg-[#0f0f1a] overflow-hidden font-sans">
       <Sidebar
         onAddTask={handleOpenAdd}
-        onScrollToTasks={() =>
-          taskListRef.current?.scrollIntoView({ behavior: 'smooth' })
-        }
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
@@ -181,7 +192,9 @@ export default function DashboardPage() {
           </div>
 
           {/* Filter Status Task */}
-          <div ref={taskListRef} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div
+            ref={taskListRef}
+            className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
               {STATUS_FILTERS.map((f) => (
                 <Button
@@ -297,4 +310,4 @@ export default function DashboardPage() {
       />
     </section>
   );
-};
+}

@@ -1,21 +1,22 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useLogout } from '../hooks/useLogout';
-import { useAuth } from '../hooks/useAuth';
-import { LayoutDashboard, ListTodo, Plus, LogOut, X } from 'lucide-react';
+import { LayoutDashboard, Plus, LogOut, X } from 'lucide-react';
 import { Button } from './BtnCustom';
 
 interface SidebarProps {
   onAddTask: () => void;
-  onScrollToTasks?: () => void;
   isOpen?: boolean;
   onClose?: () => void;
 }
 
 type ActiveMenu = 'my-tasks' | 'create-task' | null;
 
-export default function Sidebar({ onAddTask, onScrollToTasks, isOpen = true, onClose }: SidebarProps) {
-  const { user } = useAuth();
+export default function Sidebar({
+  onAddTask,
+  isOpen = true,
+  onClose,
+}: SidebarProps) {
   const { mutate: logout, isPending } = useLogout();
   const [activeMenu, setActiveMenu] = useState<ActiveMenu>(null);
 
@@ -25,12 +26,6 @@ export default function Sidebar({ onAddTask, onScrollToTasks, isOpen = true, onC
         ? 'bg-indigo-600 text-white'
         : 'text-white/55 hover:bg-white/8 hover:text-white/90 active:bg-indigo-600/70 active:text-white'
     }`;
-
-  const handleMyTasks = () => {
-    setActiveMenu('my-tasks');
-    onScrollToTasks?.();
-    onClose?.();
-  };
 
   const handleCreateTask = () => {
     setActiveMenu('create-task');
@@ -42,7 +37,9 @@ export default function Sidebar({ onAddTask, onScrollToTasks, isOpen = true, onC
   const sidebarContent = (
     <aside className="w-52 h-full bg-[#1E1B4B] flex flex-col">
       <div className="px-4 py-5 border-b border-white/10 flex items-center justify-between">
-        <div className="text-white font-semibold text-base leading-tight">My Task App</div>
+        <div className="text-white font-semibold text-base leading-tight">
+          My Task App
+        </div>
         {onClose && (
           <button
             onClick={onClose}
@@ -56,7 +53,10 @@ export default function Sidebar({ onAddTask, onScrollToTasks, isOpen = true, onC
         <NavLink
           to="/"
           end
-          onClick={() => { setActiveMenu(null); onClose?.(); }}
+          onClick={() => {
+            setActiveMenu(null);
+            onClose?.();
+          }}
           className={({ isActive }) =>
             `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-150 ${
               isActive
@@ -68,11 +68,10 @@ export default function Sidebar({ onAddTask, onScrollToTasks, isOpen = true, onC
           Dashboard
         </NavLink>
 
-        <button type="button" onClick={handleMyTasks} className={menuBtnCls('my-tasks')}>
-          <ListTodo size={16} />
-          My Tasks
-        </button>
-        <button type="button" onClick={handleCreateTask} className={menuBtnCls('create-task')}>
+        <button
+          type="button"
+          onClick={handleCreateTask}
+          className={menuBtnCls('create-task')}>
           <Plus size={16} />
           Create Task
         </button>
@@ -88,19 +87,6 @@ export default function Sidebar({ onAddTask, onScrollToTasks, isOpen = true, onC
           <LogOut size={14} />
           {isPending ? 'Logging out...' : 'Logout'}
         </Button>
-        <div className="flex items-center gap-2 mt-4 pt-3 border-t border-white/10 px-1">
-          <div className="w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center text-white text-xs font-semibold shrink-0">
-            {user?.name?.slice(0, 2).toUpperCase() || '??'}
-          </div>
-          <div className="min-w-0">
-            <div className="text-white/80 text-xs font-medium truncate capitalize">
-              {user?.name || 'User'}
-            </div>
-            <div className="text-white/35 text-[10px] truncate">
-              {user?.email || '-'}
-            </div>
-          </div>
-        </div>
       </div>
     </aside>
   );

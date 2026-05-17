@@ -5,7 +5,7 @@ import { Button } from './BtnCustom';
 type DeleteConfirmModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => Promise<void> | void;
+  onConfirm: () => void;
   loading?: boolean;
   title?: string;
   description?: string;
@@ -35,10 +35,18 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
         </div>
 
         <div className="flex gap-3">
-          <Button onClick={onClose} disabled={loading} variant="secondary" className="flex-1 cursor-pointer">
+          <Button
+            onClick={onClose}
+            disabled={loading}
+            variant="secondary"
+            className="flex-1 cursor-pointer">
             Batal
           </Button>
-          <Button onClick={onConfirm} disabled={loading} variant="danger" className="flex-1 cursor-pointer">
+          <Button
+            onClick={onConfirm}
+            disabled={loading}
+            variant="danger"
+            className="flex-1 cursor-pointer">
             {loading ? 'Menghapus...' : 'Ya, Hapus'}
           </Button>
         </div>

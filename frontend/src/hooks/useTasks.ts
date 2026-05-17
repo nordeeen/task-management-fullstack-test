@@ -5,7 +5,12 @@ import {
   updateTask,
   deleteTask,
 } from '../services/tasks';
-import type { GetTasksParams, PaginatedTasksResponse, TaskFormData } from '../types';
+import type {
+  GetTasksParams,
+  PaginatedTasksResponse,
+  TaskFormData,
+} from '../types';
+import toast from 'react-hot-toast';
 
 // Hook for get tasks (filter status, search & pagination )
 export const useTasks = (params?: GetTasksParams) => {
@@ -22,6 +27,7 @@ export const useCreateTask = () => {
   return useMutation({
     mutationFn: (data: TaskFormData) => createTask(data),
     onSuccess: () => {
+      toast.success('Create task success');
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
     },
   });
@@ -33,6 +39,7 @@ export const useUpdateTask = () => {
     mutationFn: ({ id, data }: { id: string; data: Partial<TaskFormData> }) =>
       updateTask(id, data),
     onSuccess: () => {
+      toast.success('Update task success');
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
     },
   });
@@ -43,6 +50,7 @@ export const useDeleteTask = () => {
   return useMutation({
     mutationFn: (id: string) => deleteTask(id),
     onSuccess: () => {
+      toast.success('Delete task success');
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
     },
   });

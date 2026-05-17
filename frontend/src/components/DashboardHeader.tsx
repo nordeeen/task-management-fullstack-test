@@ -50,7 +50,11 @@ export default function DashboardHeader({
 
       {/* Search — mobile only*/}
       <div className="sm:hidden px-4 py-2.5 border-b border-white/6 bg-[#13131f]">
-        <SearchInput value={search} onChange={onSearchChange} className="w-full" />
+        <SearchInput
+          value={search}
+          onChange={onSearchChange}
+          className="w-full"
+        />
       </div>
     </>
   );
