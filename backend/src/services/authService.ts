@@ -29,10 +29,10 @@ export const registerUser = async (
 
 export const loginUser = async (email: string, password: string) => {
   const user = await User.findOne({ email }).select('+password');
-  if (!user) throw new Error('Invalid credentials');
+  if (!user) throw new Error('Email tidak terdaftar');
 
   const isMatch = await user.comparePassword(password);
-  if (!isMatch) throw new Error('Invalid credentials');
+  if (!isMatch) throw new Error('Password Salah');
 
   const token = generateToken(user._id.toString());
 

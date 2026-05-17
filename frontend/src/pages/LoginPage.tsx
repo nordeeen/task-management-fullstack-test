@@ -3,12 +3,14 @@ import { PackageCheck } from 'lucide-react';
 import { PasswordToggleButton } from '../components/PasswordToggleBtn';
 import { PrimaryButton } from '../components/PrimaryBtn';
 import { useNavigate } from 'react-router-dom';
+import { useLogin } from '../hooks/useLogin';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
+  const { mutate, isPending } = useLogin();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,8 +18,15 @@ export default function LoginPage() {
       setError('Please fill in all fields.');
       return;
     }
-    setError('');
-    console.log('Login:', form);
+
+    mutate(
+      { email: form.email, password: form.password },
+      {
+        onError: (err: any) => {
+          setError(err?.response?.data?.message || 'Login failed. Try again.');
+        },
+      },
+    );
   };
 
   return (
@@ -41,7 +50,6 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right Panel */}
       <div className="flex-1 min-h-screen flex items-center justify-center px-6 py-12 lg:px-16 bg-[#0f0f1a]">
         <div className="w-full max-w-md">
           <div className="flex items-center gap-2 mb-10 lg:hidden">
@@ -120,7 +128,9 @@ export default function LoginPage() {
                 </p>
               )}
             </div>
-            <PrimaryButton type="submit">Sign up</PrimaryButton>
+            <PrimaryButton type="submit">
+              {isPending ? 'Loading...' : 'Sign in'}
+            </PrimaryButton>
           </form>
           <p className="text-center text-gray-500 text-sm mt-8 cursor-pointer">
             Don't have an account?{' '}
