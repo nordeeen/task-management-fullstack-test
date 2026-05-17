@@ -7,7 +7,7 @@ Aplikasi manajemen tugas pribadi berbasis fullstack yang dibangun dengan **Expre
 ## Screenshots
 
 ### Halaman Login
-![Halaman Login](screenshots/login-page-task-manager.png)
+![Halaman Login](screenshot/login-page-task-manager.png)
 
 ## Tech Stack
 
