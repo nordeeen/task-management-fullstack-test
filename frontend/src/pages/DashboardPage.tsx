@@ -1,18 +1,17 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { useAuthStore } from '../stores/authStore';
 import Sidebar from '../components/Sidebar';
+import DashboardHeader from '../components/DashboardHeader';
 import TaskModal from '../components/TaskModal';
 import Pagination from '../components/Pagination';
 import type { TaskStatus, Task, TaskFormData } from '../types';
 import {
   CircleDashed,
-  CircleUserRound,
   ClipboardMinus,
   LayoutGrid,
   LayoutList,
   Logs,
   PackagePlus,
-  PackageSearch,
   Repeat2,
   SquareCheckBig,
 } from 'lucide-react';
@@ -28,6 +27,7 @@ import { formatDate, isOverdue, getGreeting, useDebounce } from '../utils';
 export default function DashboardPage() {
   const authUser = useAuthStore((state) => state.user);
   const taskListRef = useRef<HTMLDivElement>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const { mutateAsync: createTask, isPending: isCreatePending } = useCreateTask();
   const { mutateAsync: updateTaskMutation, isPending: isUpdatePending } = useUpdateTask();
@@ -99,46 +99,27 @@ export default function DashboardPage() {
         onScrollToTasks={() =>
           taskListRef.current?.scrollIntoView({ behavior: 'smooth' })
         }
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
       />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="bg-[#13131f] border-b border-white/6 px-6 py-3.5 flex items-center gap-4 shrink-0">
-          <div className="flex-1 relative max-w-sm">
-            <PackageSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 pointer-events-none" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari tugas..."
-              className="w-full pl-10 pr-4 py-2 bg-[#1a1a2e] border border-white/[0.07] rounded-xl text-sm text-gray-300
-               placeholder-gray-600 focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/20 transition-all"
-            />
-          </div>
+        <DashboardHeader
+          userName={authUser?.name}
+          search={search}
+          onSearchChange={setSearch}
+          onMenuOpen={() => setSidebarOpen(true)}
+        />
 
-          <div className="ml-auto flex items-center">
-            <div className="flex items-center gap-2.5 pl-3 border-l border-white/6">
-              <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
-                <CircleUserRound />
-              </div>
-              <div className="hidden sm:block leading-tight">
-                <div className="text-sm font-semibold text-gray-200 capitalize">
-                  {authUser?.name ?? 'User'}
-                </div>
-                <div className="text-xs text-gray-600">Admin</div>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        <main className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+        <main className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 space-y-6">
           {error && (
             <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-xl px-4 py-3">
               {error.message || 'Gagal memuat tugas. Coba refresh halaman.'}
             </div>
           )}
 
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between gap-3 flex-wrap">
             <div>
-              <h1 className="text-2xl font-bold text-white tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
                 {getGreeting()},{' '}
                 <span className="text-indigo-400 capitalize">
                   {authUser?.name?.split(' ')[0] ?? '-'}
@@ -149,7 +130,7 @@ export default function DashboardPage() {
                 <span className="font-semibold text-gray-300">
                   {stats.pending + stats.inProgress}
                 </span>{' '}
-                tugas yang perlu diselesaikan hari ini.
+                tugas yang perlu diselesaikan.
               </p>
             </div>
             <div className="flex items-center gap-2.5 shrink-0">
@@ -157,13 +138,14 @@ export default function DashboardPage() {
                 variant="primary"
                 onClick={handleOpenAdd}
                 icon={<PackagePlus className="w-4 h-4" />}>
-                Add Task
+                <span className="hidden sm:inline">Add Task</span>
+                <span className="sm:hidden">Add</span>
               </Button>
             </div>
           </div>
 
           {/* Task Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <StatCard
               label="Total Tasks"
               value={stats.total}
@@ -199,8 +181,8 @@ export default function DashboardPage() {
           </div>
 
           {/* Filter Status Task */}
-          <div ref={taskListRef} className="flex items-center justify-between">
-            <div className="flex gap-1.5">
+          <div ref={taskListRef} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
               {STATUS_FILTERS.map((f) => (
                 <Button
                   key={f.value}
@@ -292,7 +274,6 @@ export default function DashboardPage() {
               ))}
             </div>
           )}
-
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -308,7 +289,6 @@ export default function DashboardPage() {
         onSubmit={handleSubmit}
         isLoading={isCreatePending || isUpdatePending}
       />
-
       <DeleteConfirmModal
         isOpen={!!confirmDeleteId}
         loading={isDeletePending}

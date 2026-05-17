@@ -82,7 +82,7 @@ export default function RegisterPage() {
               </label>
               <input
                 type="text"
-                placeholder="John Doe"
+                placeholder="input your name"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 className="w-full bg-[#1a1a2e] text-white placeholder-gray-600 rounded-xl px-4 py-3.5 text-sm border 
@@ -97,7 +97,7 @@ export default function RegisterPage() {
               </label>
               <input
                 type="email"
-                placeholder="james@company.com"
+                placeholder="input your email"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 className="w-full bg-[#1a1a2e] text-white placeholder-gray-600 rounded-xl px-4 py-3.5 text-sm border
@@ -113,11 +113,11 @@ export default function RegisterPage() {
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Mix. 6 characters"
+                  placeholder="input your password"
                   value={form.password}
                   onChange={(e) => {
                     setForm({ ...form, password: e.target.value });
-                    if (passwordError && e.target.value.length >= 8)
+                    if (passwordError && e.target.value.length >= 6)
                       setPasswordError(false);
                   }}
                   className={`w-full bg-[#1a1a2e] text-white placeholder-gray-600 rounded-xl 
@@ -135,7 +135,7 @@ export default function RegisterPage() {
               </div>
               {passwordError && (
                 <p className="text-red-400 text-xs flex items-center gap-1.5">
-                  Must be at least 8 characters long.
+                  Password must be at least 6 characters long.
                 </p>
               )}
             </div>

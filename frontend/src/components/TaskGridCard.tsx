@@ -34,7 +34,7 @@ export default function TaskGridCard({
           {statusLabel.label}
         </span>
 
-        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+        <div className="flex gap-1">
           <Button
             onClick={() => onEdit(task)}
             variant="secondary"
